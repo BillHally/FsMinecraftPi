@@ -21,7 +21,7 @@
     let private stringToBlock (str : string) =
         enum<Types.Block> (int str)
 
-    let stringToPlayerPositionInWorld (str : string) =
+    let private stringToPlayerPositionInWorld (str : string) =
         if str.StartsWith "Fail: " then
             failwithf "Error: %s" (str.Substring 6)
         else
@@ -32,11 +32,14 @@
                 Z = float split.[2]
             }
 
-    let stringToResult (str : string) =
+    let private stringToResult (str : string) =
         if str = "OK" then
             ()
         else
             failwith str
+
+    let Connect host = connect host
+    let ConnectToPort host port = connectToPort host port
 
     let Chat msg = executeCommand (Say(msg))
 

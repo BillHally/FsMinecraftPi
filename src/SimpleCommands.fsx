@@ -3,9 +3,14 @@
 #load "Connection.fs"
 #load "Minecraft.fs"
 
+open System
 open FsMinecraftPi.Types
 
-Minecraft.Chat "Merry Christmas from F#"
+Minecraft.Connect "localhost"
+Minecraft.Chat "Hello from F# (localhost connection)"
+
+Minecraft.Connect Environment.MachineName
+Minecraft.Chat (sprintf "Hello from F# (%s connection)" Environment.MachineName)
 
 Minecraft.Block Block.Grass {X = 200.; Y = 100.; Z = 2.}
 
