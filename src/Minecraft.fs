@@ -1,8 +1,16 @@
 ﻿module Minecraft
+    open System
+
     open FsMinecraftPi.Connection
     open FsMinecraftPi.Commands
     open FsMinecraftPi.Types
     open FsMinecraftPi
+
+    let private float x =
+        try
+            float x
+        with
+        | ex -> raise (Exception(sprintf "Can't convert the string '%s' to a float: %s" x ex.Message, ex))
 
     let private executeCommand command =
         command |> commandString |> execute
@@ -13,13 +21,22 @@
     let private stringToBlock (str : string) =
         enum<Types.Block> (int str)
 
-    let private stringToPlayerPositionInWorld (str : string) =
-        let split = str.Split([|','|])
-        {
-            X = float split.[0]
-            Y = float split.[1]
-            Z = float split.[2]
-        }
+    let stringToPlayerPositionInWorld (str : string) =
+        if str.StartsWith "Fail: " then
+            failwithf "Error: %s" (str.Substring 6)
+        else
+            let split = str.Split([|','|])
+            {
+                X = float split.[0]
+                Y = float split.[1]
+                Z = float split.[2]
+            }
+
+    let stringToResult (str : string) =
+        if str = "OK" then
+            ()
+        else
+            failwith str
 
     let Chat msg = executeCommand (Say(msg))
 
@@ -41,7 +58,7 @@
     let GetBlock pos = 
         executeCommandAndReturn (GetBlock(pos)) stringToBlock
 
-    let MovePlayer pos = executeCommand (MovePlayer(pos))
+    let MovePlayer pos = executeCommandAndReturn (MovePlayer(pos)) stringToResult
 
     let PlayerPosition() =
         executeCommandAndReturn (GetPlayerPos) stringToPlayerPositionInWorld
